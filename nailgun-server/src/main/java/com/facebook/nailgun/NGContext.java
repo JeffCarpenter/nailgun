@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URLClassLoader;
 import java.util.Properties;
 
 /**
@@ -61,6 +62,8 @@ public class NGContext {
   private String command = null;
 
   private String workingDirectory = null;
+
+  public static volatile URLClassLoader classLoader = null;
 
   /** The client's stdin */
   public InputStream in = null;

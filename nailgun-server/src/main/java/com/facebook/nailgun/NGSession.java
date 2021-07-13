@@ -24,6 +24,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -77,12 +79,12 @@ public class NGSession extends Thread {
   };
 
   /** A ClassLoader that may be set by a client. Defaults to the classloader of this class. */
-  public static volatile ClassLoader classLoader =
+  public static volatile URLClassLoader classLoader =
       null; // initialized in the static initializer - see below
 
   static {
     try {
-      classLoader = NGSession.class.getClassLoader();
+      classLoader = new URLClassLoader(new URL[] {}, ClassLoader.getSystemClassLoader());
     } catch (SecurityException e) {
       throw e;
     }
@@ -286,6 +288,7 @@ public class NGSession extends Thread {
           context.in = in;
           context.out = out;
           context.err = err;
+          context.classLoader = classLoader;
           context.setCommand(cmdContext.getCommand());
           context.setNGServer(server);
           context.setCommunicator(comm);

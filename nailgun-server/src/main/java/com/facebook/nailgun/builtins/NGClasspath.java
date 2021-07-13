@@ -37,37 +37,33 @@ import java.net.URLClassLoader;
 public class NGClasspath {
 
   /**
-   * Adds the specified URL (for a jar or a directory) to the System ClassLoader. This code was
-   * written by antony_miguel and posted on
+   * Adds the specified URL (for a jar or a directory) to the System ClassLoader. This code is based
+   * on a snippet written by antony_miguel and posted on
    * http://forum.java.sun.com/thread.jsp?forum=32&thread=300557&message=1191210 I assume it has
    * been placed in the public domain.
    *
-   * @param url the URL of the resource (directory or jar) to add to the System classpath
-   * @throws Exception if anything goes wrong. The most likely culprit, should this ever arise,
-   *     would be that your VM is not using a URLClassLoader as the System ClassLoader. This would
-   *     result in a ClassClastException that you probably can't do much about.
+   * @param loader the class loader to add to
+   * @param url the URL of the resource (directory or jar) to add to the classpath
+   * @throws Exception
    */
-  private static void addToSystemClassLoader(URL url) throws Exception {
-    URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-    Class sysclass = URLClassLoader.class;
-
-    java.lang.reflect.Method method = sysclass.getDeclaredMethod("addURL", new Class[] {URL.class});
+  private static void addToClassLoader(URLClassLoader loader, URL url) throws Exception {
+    java.lang.reflect.Method method =
+        URLClassLoader.class.getDeclaredMethod("addURL", new Class[] {URL.class});
     method.setAccessible(true);
-    method.invoke(sysloader, new Object[] {url});
+    method.invoke(loader, new Object[] {url});
   }
 
   public static void nailMain(NGContext context) throws Exception {
     String[] args = context.getArgs();
     if (args.length == 0) {
-      URLClassLoader sysLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-      URL[] urls = sysLoader.getURLs();
+      URL[] urls = context.classLoader.getURLs();
       for (int i = 0; i < urls.length; ++i) {
         context.out.println(urls[i]);
       }
     } else {
       for (int i = 0; i < args.length; ++i) {
         File file = new File(args[i]);
-        addToSystemClassLoader(file.toURL());
+        addToClassLoader(context.classLoader, file.toURL());
       }
     }
   }
