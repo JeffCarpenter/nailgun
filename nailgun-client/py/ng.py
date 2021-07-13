@@ -1056,6 +1056,9 @@ def main():
     # Pass any remaining command line arguments to the server.
     cmd_args = args
 
+    if cmd_args and ":" in cmd_args[0]:
+        cmd_args = cmd_args[1:] + cmd_args[0].split(":")
+
     try:
         with NailgunConnection(
             options.nailgun_server, server_port=options.nailgun_port
